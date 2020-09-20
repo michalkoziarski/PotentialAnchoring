@@ -52,7 +52,7 @@ def visualize(X, y, appended=None, anchors=None, gamma=None,
               potential_type='majority', file_name=None, lim=None):
     assert len(np.unique(y)) == 2
     assert X.shape[1] == 2
-    assert potential_type in ['majority', 'minority']
+    assert potential_type in ['majority', 'minority', 'appended']
 
     if appended is not None:
         assert appended.shape[1] == 2
@@ -123,6 +123,15 @@ def visualize(X, y, appended=None, anchors=None, gamma=None,
         )
 
     if gamma is not None:
+        if potential_type == 'majority':
+            potential_points = majority_points
+        elif potential_type == 'minority':
+            potential_points = minority_points
+        elif potential_type == 'appended':
+            potential_points = appended
+        else:
+            raise NotImplementedError
+
         x_cont = np.linspace(x_limits[0], x_limits[1], POTENTIAL_GRID_N + 1)
         y_cont = np.linspace(y_limits[0], y_limits[1], POTENTIAL_GRID_N + 1)
 
@@ -134,7 +143,7 @@ def visualize(X, y, appended=None, anchors=None, gamma=None,
             for j, x2 in enumerate(y_cont):
                 Z[j][i] = rbf_score(
                     np.array([x1, x2]),
-                    majority_points if potential_type == 'majority' else minority_points,
+                    potential_points,
                     gamma
                 )
 
