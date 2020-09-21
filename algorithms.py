@@ -133,6 +133,9 @@ class AbstractPA:
 
                 self._loss.append(loss.data.item())
 
+                if np.isnan(self._loss[-1]):
+                    raise RuntimeError('Convergence error (loss is NaN).')
+
                 pbar.set_description(f'Iteration {i + 1}: loss = {self._loss[-1]:.7f}')
                 pbar.update()
 
