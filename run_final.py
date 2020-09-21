@@ -75,12 +75,12 @@ def evaluate_trial(classifier_name, fold):
                 ),
                 'PAO': ResamplingCV(
                     PAO, classifier, seed=RANDOM_STATE,
-                    gamma=[0.1, 0.25, 0.5, 0.75, 1.0],
+                    gamma=[0.125, 0.25, 0.5, 1.0],
                     random_state=[RANDOM_STATE]
                 ),
                 'PAU': ResamplingCV(
                     PAU, classifier, seed=RANDOM_STATE,
-                    gamma=[0.1, 0.25, 0.5, 0.75, 1.0],
+                    gamma=[0.125, 0.25, 0.5, 1.0],
                     random_state=[RANDOM_STATE]
                 )
             }
