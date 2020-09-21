@@ -85,7 +85,10 @@ class AbstractPA:
         majority_points = X[y == majority_class]
 
         if self.n is None:
-            n = len(majority_points) - len(minority_points)
+            if self.kind == 'oversample':
+                n = len(majority_points) - len(minority_points)
+            else:
+                n = len(minority_points)
         else:
             n = self.n
 
