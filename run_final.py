@@ -20,7 +20,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 def evaluate_trial(classifier_name, fold):
     for dataset_name in datasets.names():
-        for resampler_name in ['None', 'SMOTE', 'Bord', 'SMOTE+TL', 'SMOTE+EN', 'PAO', 'PAU']:
+        for resampler_name in ['SMOTE', 'Bord', 'SMOTE+TL', 'SMOTE+EN', 'PAO']:
             RESULTS_PATH = Path(__file__).parents[0] / 'results_final'
             RANDOM_STATE = 42
 
@@ -75,12 +75,12 @@ def evaluate_trial(classifier_name, fold):
                 ),
                 'PAO': ResamplingCV(
                     PAO, classifier, seed=RANDOM_STATE,
-                    gamma=[0.125, 0.25, 0.5, 1.0],
+                    gamma=[0.25, 0.5, 0.75, 1.0],
                     random_state=[RANDOM_STATE]
                 ),
                 'PAU': ResamplingCV(
                     PAU, classifier, seed=RANDOM_STATE,
-                    gamma=[0.125, 0.25, 0.5, 1.0],
+                    gamma=[0.25, 0.5, 0.75, 1.0],
                     random_state=[RANDOM_STATE]
                 )
             }
