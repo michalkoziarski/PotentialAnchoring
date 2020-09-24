@@ -4,11 +4,9 @@ import logging
 import metrics
 import numpy as np
 import pandas as pd
+import smote_variants as sv
 
-from algorithms import PAO, PAU
-from cv import ResamplingCV
-from imblearn.combine import SMOTEENN, SMOTETomek
-from imblearn.over_sampling import BorderlineSMOTE, SMOTE
+from algorithms import PAO
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
@@ -19,11 +17,26 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def evaluate_trial(classifier_name, fold):
-    for dataset_name in datasets.names():
-        for resampler_name in ['SMOTE', 'Bord', 'SMOTE+TL', 'SMOTE+EN', 'PAO']:
-            RESULTS_PATH = Path(__file__).parents[0] / 'results_final'
-            RANDOM_STATE = 42
+    RESULTS_PATH = Path(__file__).parents[0] / 'results_final'
+    RANDOM_STATE = 42
 
+    resamplers = {
+        'SMOTE': sv.distance_SMOTE,
+        'polynom-fit-SMOTE': sv.polynom_fit_SMOTE,
+        'ProWSyn': sv.ProWSyn,
+        'SMOTE-IPF': sv.SMOTE_IPF,
+        'Lee': sv.Lee,
+        'SMOBD': sv.SMOBD,
+        'G-SMOTE': sv.G_SMOTE,
+        'CCR': sv.CCR,
+        'LVQ-SMOTE': sv.LVQ_SMOTE,
+        'Assembled-SMOTE': sv.Assembled_SMOTE,
+        'SMOTE-TomekLinks': sv.SMOTE_TomekLinks,
+        'PAO': PAO
+    }
+
+    for dataset_name in datasets.names():
+        for resampler_name in resamplers.keys():
             trial_name = f'{dataset_name}_{fold}_{classifier_name}_{resampler_name}'
             trial_path = RESULTS_PATH / f'{trial_name}.csv'
 
@@ -50,47 +63,11 @@ def evaluate_trial(classifier_name, fold):
 
             classifier = classifiers[classifier_name]
 
-            resamplers = {
-                'None': None,
-                'SMOTE': ResamplingCV(
-                    SMOTE, classifier,
-                    k_neighbors=[1, 3, 5, 7, 9],
-                    random_state=[RANDOM_STATE], seed=RANDOM_STATE
-                ),
-                'Bord': ResamplingCV(
-                    BorderlineSMOTE, classifier,
-                    k_neighbors=[1, 3, 5, 7, 9],
-                    m_neighbors=[5, 10, 15],
-                    random_state=[RANDOM_STATE], seed=RANDOM_STATE
-                ),
-                'SMOTE+TL': ResamplingCV(
-                    SMOTETomek, classifier,
-                    smote=[SMOTE(k_neighbors=k) for k in [1, 3, 5, 7, 9]],
-                    random_state=[RANDOM_STATE], seed=RANDOM_STATE
-                ),
-                'SMOTE+EN': ResamplingCV(
-                    SMOTEENN, classifier,
-                    smote=[SMOTE(k_neighbors=k) for k in [1, 3, 5, 7, 9]],
-                    random_state=[RANDOM_STATE], seed=RANDOM_STATE
-                ),
-                'PAO': ResamplingCV(
-                    PAO, classifier, seed=RANDOM_STATE,
-                    gamma=[0.25, 0.5, 0.75, 1.0],
-                    random_state=[RANDOM_STATE]
-                ),
-                'PAU': ResamplingCV(
-                    PAU, classifier, seed=RANDOM_STATE,
-                    gamma=[0.25, 0.5, 0.75, 1.0],
-                    random_state=[RANDOM_STATE]
-                )
-            }
-
-            resampler = resamplers[resampler_name]
+            resampler = resamplers[resampler_name](random_state=RANDOM_STATE)
 
             assert len(np.unique(y_train)) == len(np.unique(y_test)) == 2
 
-            if resampler is not None:
-                X_train, y_train = resampler.fit_sample(X_train, y_train)
+            X_train, y_train = resampler.sample(X_train, y_train)
 
             clf = classifier.fit(X_train, y_train)
             predictions = clf.predict(X_test)

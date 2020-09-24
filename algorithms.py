@@ -38,7 +38,7 @@ def loss_function(anchors, prototypes, gamma, reference_potential):
 
 
 class AbstractPA:
-    def __init__(self, kind, gamma=0.25, n_anchors=25, learning_rate=0.001, max_iterations=100,
+    def __init__(self, kind, gamma=0.25, n_anchors=25, learning_rate=0.0001, max_iterations=100,
                  min_iterations=25, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
                  random_state=None, device=torch.device('cpu')):
         assert kind in ['oversample', 'undersample']
@@ -60,7 +60,7 @@ class AbstractPA:
         self._prototypes = None
         self._loss = None
 
-    def fit_sample(self, X, y):
+    def sample(self, X, y):
         if self.random_state is not None:
             np.random.seed(self.random_state)
             torch.random.manual_seed(self.random_state)
