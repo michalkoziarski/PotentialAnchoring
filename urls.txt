@@ -21,6 +21,7 @@ http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/ec
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/ecoli-0-1_vs_2-3-5.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/ecoli-0-2-6-7_vs_3-5.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/ecoli-0-6-7_vs_3-5.zip
+http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/ecoli-0-6-7_vs_5.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/glass-0-1-4-6_vs_2.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/glass-0-1-5_vs_2.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p2/yeast-0-2-5-6_vs_3-7-8-9.zip
@@ -30,6 +31,8 @@ http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/ab
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/abalone-20_vs_8-9-10.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/abalone-21_vs_8.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/flare-F.zip
+http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/kddcup-buffer_overflow_vs_back.zip
+http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/kddcup-rootkit-imap_vs_back.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/kr-vs-k-zero_vs_eight.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/poker-8-9_vs_5.zip
 http://sci2s.ugr.es/keel/keel-dataset/datasets/imbalanced/imb_IRhigherThan9p3/poker-8-9_vs_6.zip
