@@ -5,7 +5,7 @@ import metrics
 import numpy as np
 import pandas as pd
 
-from algorithms import PAO
+from algorithms import PAO, PAU
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
@@ -19,67 +19,73 @@ def evaluate_trial(classifier_name, fold):
     RESULTS_PATH = Path(__file__).parents[0] / 'results_preliminary_lr'
     RANDOM_STATE = 42
 
-    for dataset_name in datasets.names():
-        for lr in [0.1, 0.01, 0.001, 0.0001, 0.00001]:
-            trial_name = f'{dataset_name}_{fold}_{classifier_name}_{lr}'
-            trial_path = RESULTS_PATH / f'{trial_name}.csv'
+    for resampler_name in ['PAO', 'PAU']:
+        for dataset_name in datasets.names():
+            for lr in [0.1, 0.01, 0.001, 0.0001, 0.00001]:
+                trial_name = f'{dataset_name}_{fold}_{classifier_name}_{resampler_name}_{lr}'
+                trial_path = RESULTS_PATH / f'{trial_name}.csv'
 
-            if trial_path.exists():
-                continue
+                if trial_path.exists():
+                    continue
 
-            logging.info(f'Evaluating {trial_name}...')
+                logging.info(f'Evaluating {trial_name}...')
 
-            dataset = datasets.load(dataset_name)
+                dataset = datasets.load(dataset_name)
 
-            (X_train, y_train), (X_test, y_test) = dataset[fold][0], dataset[fold][1]
+                (X_train, y_train), (X_test, y_test) = dataset[fold][0], dataset[fold][1]
 
-            classifiers = {
-                'CART': DecisionTreeClassifier(random_state=RANDOM_STATE),
-                'KNN': KNeighborsClassifier(),
-                'L-SVM': LinearSVC(random_state=RANDOM_STATE),
-                'R-SVM': SVC(random_state=RANDOM_STATE, kernel='rbf'),
-                'P-SVM': SVC(random_state=RANDOM_STATE, kernel='poly'),
-                'LR': LogisticRegression(random_state=RANDOM_STATE),
-                'NB': GaussianNB(),
-                'R-MLP': MLPClassifier(random_state=RANDOM_STATE),
-                'L-MLP': MLPClassifier(random_state=RANDOM_STATE, activation='identity')
-            }
+                classifiers = {
+                    'CART': DecisionTreeClassifier(random_state=RANDOM_STATE),
+                    'KNN': KNeighborsClassifier(),
+                    'L-SVM': LinearSVC(random_state=RANDOM_STATE),
+                    'R-SVM': SVC(random_state=RANDOM_STATE, kernel='rbf'),
+                    'P-SVM': SVC(random_state=RANDOM_STATE, kernel='poly'),
+                    'LR': LogisticRegression(random_state=RANDOM_STATE),
+                    'NB': GaussianNB(),
+                    'R-MLP': MLPClassifier(random_state=RANDOM_STATE),
+                    'L-MLP': MLPClassifier(random_state=RANDOM_STATE, activation='identity')
+                }
 
-            classifier = classifiers[classifier_name]
+                classifier = classifiers[classifier_name]
 
-            resampler = PAO(learning_rate=lr, random_state=RANDOM_STATE)
+                resamplers = {
+                    'PAO': PAO(learning_rate=lr, random_state=RANDOM_STATE),
+                    'PAU': PAU(learning_rate=lr, random_state=RANDOM_STATE)
+                }
 
-            assert len(np.unique(y_train)) == len(np.unique(y_test)) == 2
+                resampler = resamplers[resampler_name]
 
-            try:
-                X_train, y_train = resampler.sample(X_train, y_train)
-            except RuntimeError:
-                continue
+                assert len(np.unique(y_train)) == len(np.unique(y_test)) == 2
 
-            clf = classifier.fit(X_train, y_train)
-            predictions = clf.predict(X_test)
+                try:
+                    X_train, y_train = resampler.sample(X_train, y_train)
+                except RuntimeError:
+                    continue
 
-            scoring_functions = {
-                'Precision': metrics.precision,
-                'Recall': metrics.recall,
-                'Specificity': metrics.specificity,
-                'AUC': metrics.auc,
-                'G-mean': metrics.g_mean,
-                'F-measure': metrics.f_measure
-            }
+                clf = classifier.fit(X_train, y_train)
+                predictions = clf.predict(X_test)
 
-            rows = []
+                scoring_functions = {
+                    'Precision': metrics.precision,
+                    'Recall': metrics.recall,
+                    'Specificity': metrics.specificity,
+                    'AUC': metrics.auc,
+                    'G-mean': metrics.g_mean,
+                    'F-measure': metrics.f_measure
+                }
 
-            for scoring_function_name in scoring_functions.keys():
-                score = scoring_functions[scoring_function_name](y_test, predictions)
-                row = [dataset_name, fold, classifier_name, lr, scoring_function_name, score]
-                rows.append(row)
+                rows = []
 
-            columns = ['Dataset', 'Fold', 'Classifier', 'LR', 'Metric', 'Score']
+                for scoring_function_name in scoring_functions.keys():
+                    score = scoring_functions[scoring_function_name](y_test, predictions)
+                    row = [dataset_name, fold, classifier_name, resampler_name, lr, scoring_function_name, score]
+                    rows.append(row)
 
-            RESULTS_PATH.mkdir(exist_ok=True, parents=True)
+                columns = ['Dataset', 'Fold', 'Classifier', 'Resampler', 'LR', 'Metric', 'Score']
 
-            pd.DataFrame(rows, columns=columns).to_csv(trial_path, index=False)
+                RESULTS_PATH.mkdir(exist_ok=True, parents=True)
+
+                pd.DataFrame(rows, columns=columns).to_csv(trial_path, index=False)
 
 
 if __name__ == '__main__':
