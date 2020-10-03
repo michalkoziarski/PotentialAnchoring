@@ -38,9 +38,9 @@ def loss_function(anchors, prototypes, gamma, reference_potential):
 
 
 class AbstractPA:
-    def __init__(self, kind, gamma=0.25, n_anchors=25, learning_rate=0.001, max_iterations=100,
+    def __init__(self, kind, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
                  min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
-                 random_state=None, device=torch.device('cpu')):
+                 ratio=None, random_state=None, device=torch.device('cpu')):
         assert kind in ['oversample', 'undersample']
 
         self.kind = kind
@@ -53,6 +53,7 @@ class AbstractPA:
         self.epsilon = epsilon
         self.minority_class = minority_class
         self.n = n
+        self.ratio = ratio
         self.random_state = random_state
         self.device = device
 
@@ -85,13 +86,22 @@ class AbstractPA:
         minority_points = X[y == minority_class]
         majority_points = X[y == majority_class]
 
-        if self.n is None:
+        assert not (self.n is not None) and (self.ratio is not None)
+
+        if self.n is not None:
+            n = self.n
+        elif self.ratio is not None:
+            if self.kind == 'oversample':
+                n = int(self.ratio * (len(majority_points) - len(minority_points)))
+            else:
+                n = len(majority_points) - int(self.ratio * (len(majority_points) - len(minority_points)))
+        else:
             if self.kind == 'oversample':
                 n = len(majority_points) - len(minority_points)
             else:
                 n = len(minority_points)
-        else:
-            n = self.n
+
+        print(len(majority_points), len(minority_points), n)
 
         if n == 0:
             return X, y
@@ -155,26 +165,26 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.25, n_anchors=25, learning_rate=0.001, max_iterations=100,
+    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
                  min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
-                 random_state=None, device=torch.device('cpu')):
+                 ratio=None, random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='oversample', gamma=gamma, n_anchors=n_anchors,
             learning_rate=learning_rate, max_iterations=max_iterations,
             min_iterations=min_iterations, tolerance=tolerance,
             epsilon=epsilon, minority_class=minority_class,
-            n=n, random_state=random_state, device=device
+            n=n, ratio=ratio, random_state=random_state, device=device
         )
 
 
 class PAU(AbstractPA):
-    def __init__(self, gamma=0.25, n_anchors=25, learning_rate=0.001, max_iterations=100,
+    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
                  min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
-                 random_state=None, device=torch.device('cpu')):
+                 ratio=None, random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='undersample', gamma=gamma, n_anchors=n_anchors,
             learning_rate=learning_rate, max_iterations=max_iterations,
             min_iterations=min_iterations, tolerance=tolerance,
             epsilon=epsilon, minority_class=minority_class,
-            n=n, random_state=random_state, device=device
+            n=n, ratio=ratio, random_state=random_state, device=device
         )
