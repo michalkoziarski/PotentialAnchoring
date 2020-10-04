@@ -38,8 +38,8 @@ def loss_function(anchors, prototypes, gamma, reference_potential):
 
 
 class AbstractPA:
-    def __init__(self, kind, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
-                 min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
+    def __init__(self, kind, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=200,
+                 min_iterations=100, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
                  ratio=None, random_state=None, device=torch.device('cpu')):
         assert kind in ['oversample', 'undersample']
 
@@ -163,8 +163,8 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
-                 min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
+    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=200,
+                 min_iterations=100, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
                  ratio=None, random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='oversample', gamma=gamma, n_anchors=n_anchors,
@@ -176,8 +176,8 @@ class PAO(AbstractPA):
 
 
 class PAU(AbstractPA):
-    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=100,
-                 min_iterations=10, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
+    def __init__(self, gamma=0.25, n_anchors=10, learning_rate=0.001, max_iterations=200,
+                 min_iterations=100, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
                  ratio=None, random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='undersample', gamma=gamma, n_anchors=n_anchors,
@@ -190,7 +190,7 @@ class PAU(AbstractPA):
 
 class CPA:
     def __init__(self, ratio, gamma=0.25, n_anchors=10, learning_rate=0.001,
-                 max_iterations=100, min_iterations=10, tolerance=1e-8, epsilon=1e-4,
+                 max_iterations=200, min_iterations=100, tolerance=1e-8, epsilon=1e-4,
                  minority_class=None, random_state=None, device=torch.device('cpu')):
         assert 0 <= ratio <= 1
 
