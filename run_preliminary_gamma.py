@@ -21,7 +21,7 @@ def evaluate_trial(classifier_name, fold):
 
     for resampler_name in ['PAO', 'PAU']:
         for dataset_name in datasets.names():
-            for gamma in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+            for gamma in [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
                 trial_name = f'{dataset_name}_{fold}_{classifier_name}_{resampler_name}_{gamma}'
                 trial_path = RESULTS_PATH / f'{trial_name}.csv'
 
