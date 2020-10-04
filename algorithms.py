@@ -86,7 +86,7 @@ class AbstractPA:
         minority_points = X[y == minority_class]
         majority_points = X[y == majority_class]
 
-        assert not (self.n is not None) and (self.ratio is not None)
+        assert not ((self.n is not None) and (self.ratio is not None))
 
         if self.n is not None:
             n = self.n
@@ -100,8 +100,6 @@ class AbstractPA:
                 n = len(majority_points) - len(minority_points)
             else:
                 n = len(minority_points)
-
-        print(len(majority_points), len(minority_points), n)
 
         if n == 0:
             return X, y
@@ -188,3 +186,80 @@ class PAU(AbstractPA):
             epsilon=epsilon, minority_class=minority_class,
             n=n, ratio=ratio, random_state=random_state, device=device
         )
+
+
+class CPA:
+    def __init__(self, ratio, gamma=0.25, n_anchors=10, learning_rate=0.001,
+                 max_iterations=100, min_iterations=10, tolerance=1e-8, epsilon=1e-4,
+                 minority_class=None, random_state=None, device=torch.device('cpu')):
+        assert 0 <= ratio <= 1
+
+        self.ratio = ratio
+        self.gamma = gamma
+        self.n_anchors = n_anchors
+        self.learning_rate = learning_rate
+        self.max_iterations = max_iterations
+        self.min_iterations = min_iterations
+        self.tolerance = tolerance
+        self.epsilon = epsilon
+        self.minority_class = minority_class
+        self.random_state = random_state
+        self.device = device
+
+        self.pao = PAO(
+            gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
+            max_iterations=max_iterations, min_iterations=min_iterations,
+            tolerance=tolerance, epsilon=epsilon, minority_class=minority_class,
+            random_state=random_state, device=device
+        )
+
+        self.pau = PAU(
+            gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
+            max_iterations=max_iterations, min_iterations=min_iterations,
+            tolerance=tolerance, epsilon=epsilon, minority_class=minority_class,
+            random_state=random_state, device=device
+        )
+
+    def sample(self, X, y):
+        classes = np.unique(y)
+
+        assert len(classes) == 2
+
+        if self.minority_class is None:
+            sizes = [sum(y == c) for c in classes]
+
+            minority_class = classes[np.argmin(sizes)]
+            majority_class = classes[np.argmax(sizes)]
+        else:
+            minority_class = self.minority_class
+
+            if classes[0] != minority_class:
+                majority_class = classes[0]
+            else:
+                majority_class = classes[1]
+
+        minority_points = X[y == minority_class]
+        majority_points = X[y == majority_class]
+
+        n = len(majority_points) - len(minority_points)
+
+        self.pao.n = int(self.ratio * n)
+        self.pau.n = int((1 - self.ratio) * n) + len(minority_points)
+
+        self.pao.sample(X, y)
+        self.pau.sample(X, y)
+
+        if self.pau._prototypes is None:
+            X_, y_ = X, y
+        else:
+            X_ = np.concatenate([minority_points, self.pau._prototypes])
+            y_ = np.concatenate([
+                minority_class * np.ones(len(minority_points)),
+                majority_class * np.ones(len(self.pau._prototypes))
+            ])
+
+        if self.pao._prototypes is not None:
+            X_ = np.concatenate([X_, self.pao._prototypes])
+            y_ = np.concatenate([y_, minority_class * np.ones(len(self.pao._prototypes))])
+
+        return X_, y_
