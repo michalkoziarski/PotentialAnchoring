@@ -36,7 +36,7 @@ def evaluate_trial(classifier_name, fold):
 
                 classifiers = {
                     'CART': DecisionTreeClassifier(random_state=RANDOM_STATE),
-                    'KNN': KNeighborsClassifier(),
+                    'KNN': KNeighborsClassifier(n_neighbors=3),
                     'L-SVM': LinearSVC(random_state=RANDOM_STATE),
                     'R-SVM': SVC(random_state=RANDOM_STATE, kernel='rbf'),
                     'P-SVM': SVC(random_state=RANDOM_STATE, kernel='poly'),
