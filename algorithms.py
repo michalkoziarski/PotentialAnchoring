@@ -101,7 +101,7 @@ class AbstractPA:
             else:
                 n = len(minority_points)
 
-        if n == 0:
+        if (self.kind == 'oversample' and n == 0) or (self.kind != 'oversample' and n == len(majority_points)):
             return X, y
 
         self._anchors = torch.tensor(
@@ -244,7 +244,7 @@ class CPA:
         n = len(majority_points) - len(minority_points)
 
         self.pao.n = int(self.ratio * n)
-        self.pau.n = int((1 - self.ratio) * n) + len(minority_points)
+        self.pau.n = len(majority_points) - int((1 - self.ratio) * n)
 
         self.pao.sample(X, y)
         self.pau.sample(X, y)
