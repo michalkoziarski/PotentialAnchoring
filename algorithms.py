@@ -38,8 +38,8 @@ def loss_function(anchors, prototypes, gamma, reference_potential):
 
 
 class AbstractPA:
-    def __init__(self, kind, gamma=0.5, n_anchors=10, learning_rate=0.0001, max_iterations=200,
-                 min_iterations=50, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
+    def __init__(self, kind, gamma=0.5, n_anchors=10, learning_rate=0.0001,
+                 iterations=200, epsilon=1e-4, minority_class=None, n=None,
                  ratio=None, random_state=None, device=torch.device('cpu')):
         assert kind in ['oversample', 'undersample']
 
@@ -47,9 +47,7 @@ class AbstractPA:
         self.gamma = gamma
         self.n_anchors = n_anchors
         self.learning_rate = learning_rate
-        self.max_iterations = max_iterations
-        self.min_iterations = min_iterations
-        self.tolerance = tolerance
+        self.iterations = iterations
         self.epsilon = epsilon
         self.minority_class = minority_class
         self.n = n
@@ -127,13 +125,9 @@ class AbstractPA:
 
         self._loss = []
 
-        with tqdm(total=self.max_iterations) as pbar:
-            for i in range(self.max_iterations):
+        with tqdm(total=self.iterations) as pbar:
+            for i in range(self.iterations):
                 loss = loss_function(self._anchors, self._prototypes, self.gamma, reference_potential)
-
-                if self.tolerance is not None and len(self._loss) > self.min_iterations \
-                        and self._loss[-2] - self._loss[-1] < self.tolerance:
-                    break
 
                 optimizer.zero_grad()
 
@@ -163,26 +157,24 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, max_iterations=200,
-                 min_iterations=50, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
-                 ratio=None, random_state=None, device=torch.device('cpu')):
+    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, iterations=200,
+                 epsilon=1e-4, minority_class=None, n=None, ratio=None,
+                 random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='oversample', gamma=gamma, n_anchors=n_anchors,
-            learning_rate=learning_rate, max_iterations=max_iterations,
-            min_iterations=min_iterations, tolerance=tolerance,
+            learning_rate=learning_rate, iterations=iterations,
             epsilon=epsilon, minority_class=minority_class,
             n=n, ratio=ratio, random_state=random_state, device=device
         )
 
 
 class PAU(AbstractPA):
-    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, max_iterations=200,
-                 min_iterations=50, tolerance=1e-8, epsilon=1e-4, minority_class=None, n=None,
-                 ratio=None, random_state=None, device=torch.device('cpu')):
+    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, iterations=200,
+                 epsilon=1e-4, minority_class=None, n=None, ratio=None,
+                 random_state=None, device=torch.device('cpu')):
         super().__init__(
             kind='undersample', gamma=gamma, n_anchors=n_anchors,
-            learning_rate=learning_rate, max_iterations=max_iterations,
-            min_iterations=min_iterations, tolerance=tolerance,
+            learning_rate=learning_rate, iterations=iterations,
             epsilon=epsilon, minority_class=minority_class,
             n=n, ratio=ratio, random_state=random_state, device=device
         )
@@ -190,17 +182,15 @@ class PAU(AbstractPA):
 
 class CPA:
     def __init__(self, ratio, gamma=0.5, n_anchors=10, learning_rate=0.0001,
-                 max_iterations=200, min_iterations=50, tolerance=1e-8, epsilon=1e-4,
-                 minority_class=None, random_state=None, device=torch.device('cpu')):
+                 iterations=200, epsilon=1e-4, minority_class=None,
+                 random_state=None, device=torch.device('cpu')):
         assert 0 <= ratio <= 1
 
         self.ratio = ratio
         self.gamma = gamma
         self.n_anchors = n_anchors
         self.learning_rate = learning_rate
-        self.max_iterations = max_iterations
-        self.min_iterations = min_iterations
-        self.tolerance = tolerance
+        self.iterations = iterations
         self.epsilon = epsilon
         self.minority_class = minority_class
         self.random_state = random_state
@@ -208,15 +198,13 @@ class CPA:
 
         self.pao = PAO(
             gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
-            max_iterations=max_iterations, min_iterations=min_iterations,
-            tolerance=tolerance, epsilon=epsilon, minority_class=minority_class,
+            iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
 
         self.pau = PAU(
             gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
-            max_iterations=max_iterations, min_iterations=min_iterations,
-            tolerance=tolerance, epsilon=epsilon, minority_class=minority_class,
+            iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
 
