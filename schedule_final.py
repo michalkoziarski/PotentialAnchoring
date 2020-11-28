@@ -2,11 +2,9 @@ import os
 
 
 RESAMPLERS = [
-    'SMOTE', 'polynom-fit-SMOTE', 'ProWSyn',
-    'SMOTE-IPF', 'Lee', 'SMOBD', 'G-SMOTE',
-    'CCR', 'LVQ-SMOTE', 'Assembled-SMOTE',
-    'SMOTE-TomekLinks', 'PAO', 'PAU',
-    'CPA.1', 'CPA.9'
+    'SMOTE', 'polynom-fit-SMOTE', 'Lee', 'SMOBD',
+    'G-SMOTE', 'LVQ-SMOTE', 'Assembled-SMOTE',
+    'SMOTE-TomekLinks', 'RBO', 'CPA'
 ]
 
 

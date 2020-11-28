@@ -6,13 +6,12 @@ import numpy as np
 import pandas as pd
 import smote_variants as sv
 
-from algorithms import CPA, PAO, PAU
+from algorithms import CPA
 from pathlib import Path
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
+from rbo import RBO
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 
@@ -23,32 +22,22 @@ def evaluate_trial(resampler_name, fold):
     resamplers = {
         'SMOTE': sv.distance_SMOTE(random_state=RANDOM_STATE),
         'polynom-fit-SMOTE': sv.polynom_fit_SMOTE(random_state=RANDOM_STATE),
-        'ProWSyn': sv.ProWSyn(random_state=RANDOM_STATE),
-        'SMOTE-IPF': sv.SMOTE_IPF(random_state=RANDOM_STATE),
         'Lee': sv.Lee(random_state=RANDOM_STATE),
         'SMOBD': sv.SMOBD(random_state=RANDOM_STATE),
         'G-SMOTE': sv.G_SMOTE(random_state=RANDOM_STATE),
-        'CCR': sv.CCR(random_state=RANDOM_STATE),
         'LVQ-SMOTE': sv.LVQ_SMOTE(random_state=RANDOM_STATE),
         'Assembled-SMOTE': sv.Assembled_SMOTE(random_state=RANDOM_STATE),
         'SMOTE-TomekLinks': sv.SMOTE_TomekLinks(random_state=RANDOM_STATE),
-        'PAO': PAO(random_state=RANDOM_STATE),
-        'PAU': PAU(random_state=RANDOM_STATE),
-        'CPA.1': CPA(ratio=0.1, random_state=RANDOM_STATE),
-        'CPA.9': CPA(ratio=0.9, random_state=RANDOM_STATE)
+        'RBO': RBO(random_state=RANDOM_STATE),
+        'CPA': CPA(ratio=0.1, random_state=RANDOM_STATE)
     }
 
     for dataset_name in datasets.names():
         classifiers = {
             'CART': DecisionTreeClassifier(random_state=RANDOM_STATE),
             'KNN': KNeighborsClassifier(n_neighbors=3),
-            'L-SVM': LinearSVC(random_state=RANDOM_STATE),
-            'R-SVM': SVC(random_state=RANDOM_STATE, kernel='rbf'),
-            'P-SVM': SVC(random_state=RANDOM_STATE, kernel='poly'),
-            'LR': LogisticRegression(random_state=RANDOM_STATE),
-            'NB': GaussianNB(),
-            'R-MLP': MLPClassifier(random_state=RANDOM_STATE),
-            'L-MLP': MLPClassifier(random_state=RANDOM_STATE, activation='identity')
+            'SVM': SVC( kernel='rbf', random_state=RANDOM_STATE),
+            'MLP': MLPClassifier(random_state=RANDOM_STATE)
         }
 
         trial_name = f'{dataset_name}_{fold}_{resampler_name}'
@@ -80,10 +69,8 @@ def evaluate_trial(resampler_name, fold):
             scoring_functions = {
                 'Precision': metrics.precision,
                 'Recall': metrics.recall,
-                'Specificity': metrics.specificity,
                 'AUC': metrics.auc,
-                'G-mean': metrics.g_mean,
-                'F-measure': metrics.f_measure
+                'G-mean': metrics.g_mean
             }
 
             for scoring_function_name in scoring_functions.keys():
