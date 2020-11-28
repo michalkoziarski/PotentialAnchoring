@@ -5,31 +5,24 @@ import metrics
 import numpy as np
 import pandas as pd
 
-from algorithms import CPA
+from algorithms import PA
 from pathlib import Path
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 
 def evaluate_trial(ratio, fold):
-    RESULTS_PATH = Path(__file__).parents[0] / 'results_preliminary_cpa'
+    RESULTS_PATH = Path(__file__).parents[0] / 'results_preliminary'
     RANDOM_STATE = 42
 
     for dataset_name in datasets.names():
         classifiers = {
             'CART': DecisionTreeClassifier(random_state=RANDOM_STATE),
             'KNN': KNeighborsClassifier(n_neighbors=3),
-            'L-SVM': LinearSVC(random_state=RANDOM_STATE),
-            'R-SVM': SVC(random_state=RANDOM_STATE, kernel='rbf'),
-            'P-SVM': SVC(random_state=RANDOM_STATE, kernel='poly'),
-            'LR': LogisticRegression(random_state=RANDOM_STATE),
-            'NB': GaussianNB(),
-            'R-MLP': MLPClassifier(random_state=RANDOM_STATE),
-            'L-MLP': MLPClassifier(random_state=RANDOM_STATE, activation='identity')
+            'SVM': SVC(kernel='rbf', random_state=RANDOM_STATE),
+            'MLP': MLPClassifier(random_state=RANDOM_STATE)
         }
 
         trial_name = f'{dataset_name}_{fold}_{ratio}'
@@ -44,7 +37,7 @@ def evaluate_trial(ratio, fold):
 
         (X_train, y_train), (X_test, y_test) = dataset[fold][0], dataset[fold][1]
 
-        resampler = CPA(ratio=ratio, random_state=RANDOM_STATE)
+        resampler = PA(ratio=ratio, random_state=RANDOM_STATE)
 
         assert len(np.unique(y_train)) == len(np.unique(y_test)) == 2
 
@@ -64,10 +57,8 @@ def evaluate_trial(ratio, fold):
             scoring_functions = {
                 'Precision': metrics.precision,
                 'Recall': metrics.recall,
-                'Specificity': metrics.specificity,
                 'AUC': metrics.auc,
-                'G-mean': metrics.g_mean,
-                'F-measure': metrics.f_measure
+                'G-mean': metrics.g_mean
             }
 
             for scoring_function_name in scoring_functions.keys():
