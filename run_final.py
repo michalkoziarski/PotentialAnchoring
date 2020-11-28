@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import smote_variants as sv
 
-from algorithms import CPA
+from algorithms import PA
 from pathlib import Path
 from rbo import RBO
 from sklearn.neighbors import KNeighborsClassifier
@@ -29,7 +29,7 @@ def evaluate_trial(resampler_name, fold):
         'Assembled-SMOTE': sv.Assembled_SMOTE(random_state=RANDOM_STATE),
         'SMOTE-TomekLinks': sv.SMOTE_TomekLinks(random_state=RANDOM_STATE),
         'RBO': RBO(random_state=RANDOM_STATE),
-        'CPA': CPA(ratio=0.1, random_state=RANDOM_STATE)
+        'PA': PA(random_state=RANDOM_STATE)
     }
 
     for dataset_name in datasets.names():

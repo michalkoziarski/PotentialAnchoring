@@ -4,7 +4,7 @@ import os
 RESAMPLERS = [
     'SMOTE', 'polynom-fit-SMOTE', 'Lee', 'SMOBD',
     'G-SMOTE', 'LVQ-SMOTE', 'Assembled-SMOTE',
-    'SMOTE-TomekLinks', 'RBO', 'CPA'
+    'SMOTE-TomekLinks', 'RBO', 'PA'
 ]
 
 

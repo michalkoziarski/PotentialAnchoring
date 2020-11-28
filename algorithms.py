@@ -180,8 +180,8 @@ class PAU(AbstractPA):
         )
 
 
-class CPA:
-    def __init__(self, ratio, gamma=0.5, n_anchors=10, learning_rate=0.0001,
+class PA:
+    def __init__(self, ratio=0.1, gamma=0.5, n_anchors=10, learning_rate=0.0001,
                  iterations=200, epsilon=1e-4, minority_class=None,
                  random_state=None, device=torch.device('cpu')):
         assert 0 <= ratio <= 1
