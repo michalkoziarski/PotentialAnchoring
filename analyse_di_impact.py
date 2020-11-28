@@ -74,6 +74,9 @@ def prepare_df():
 
 
 def export_correlation(df):
+    print(' & '.join([''] + CLASSIFIERS) + ' \\\\')
+    print('\\midrule')
+
     for metric in METRICS:
         row = [metric]
 
