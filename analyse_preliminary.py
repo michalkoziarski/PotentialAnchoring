@@ -18,7 +18,7 @@ if __name__ == '__main__':
         sharey='col', height=2.0, aspect=1.4, kind='point', ci=None,
         row_order=['KNN', 'CART', 'SVM', 'MLP'],
         col_order=['Precision', 'Recall', 'AUC', 'G-mean'],
-        hue='Metric'
+        hue='Metric', palette='muted'
     )
     g.set_titles('{row_name}, {col_name}')
     g.set_xticklabels(rotation=45)

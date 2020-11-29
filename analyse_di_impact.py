@@ -100,7 +100,7 @@ def export_correlation(df):
 
 def visualize(df):
     g = sns.lmplot(
-        x='DI', y='Rank', data=df,
+        x='DI', y='Rank', data=df, palette='muted',
         col='Metric', row='Classifier', hue='Metric', truncate=True,
         sharex=False, height=3.0, scatter_kws={'alpha': 0.3, 's': 100}
     )
