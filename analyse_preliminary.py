@@ -16,8 +16,6 @@ if __name__ == '__main__':
     g = sns.catplot(
         data=df, x='Ratio', y='Score', row='Classifier', col='Metric',
         sharey='col', height=2.0, aspect=1.4, kind='point', ci=None,
-        row_order=['KNN', 'CART', 'SVM', 'MLP'],
-        col_order=['Precision', 'Recall', 'AUC', 'G-mean'],
         hue='Metric', palette='muted'
     )
     g.set_titles('{row_name}, {col_name}')
