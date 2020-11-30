@@ -24,18 +24,6 @@ def recall(ground_truth, predictions, minority_class=None):
     return sklearn.metrics.recall_score(ground_truth, predictions, pos_label=minority_class, zero_division=0)
 
 
-def specificity(ground_truth, predictions, majority_class=None):
-    if majority_class is None:
-        majority_class = Counter(ground_truth).most_common()[0][0]
-
-    return sklearn.metrics.recall_score(ground_truth, predictions, pos_label=majority_class, zero_division=0)
-
-
-@metric_decorator
-def f_measure(ground_truth, predictions, minority_class=None):
-    return sklearn.metrics.f1_score(ground_truth, predictions, pos_label=minority_class, zero_division=0)
-
-
 def g_mean(ground_truth, predictions):
     return imblearn.metrics.geometric_mean_score(ground_truth, predictions)
 
