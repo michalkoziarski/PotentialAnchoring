@@ -3,6 +3,7 @@ import zipfile
 import numpy as np
 import pandas as pd
 import pickle
+import random
 
 from sklearn import preprocessing
 from sklearn.model_selection import StratifiedKFold
@@ -67,7 +68,7 @@ def partition(X, y):
     return partitions
 
 
-def load(name, url=None, encode_features=True, remove_metadata=True, scale=True):
+def load(name, url=None, encode_features=True, remove_metadata=True, scale=True, noise_level=0.0):
     file_name = '%s.dat' % name
 
     if url is not None:
@@ -116,6 +117,30 @@ def load(name, url=None, encode_features=True, remove_metadata=True, scale=True)
 
                 train_set[0] = scaler.transform(train_set[0])
                 test_set[0] = scaler.transform(test_set[0])
+
+            if noise_level > 0.0:
+                random.seed(42)
+
+                classes = np.unique(y)
+                sizes = [sum(train_set[1] == c) for c in classes]
+
+                minority_class = classes[np.argmin(sizes)]
+                majority_class = classes[np.argmax(sizes)]
+
+                assert minority_class != majority_class
+
+                n_converted = int(np.round(noise_level * np.max(sizes)))
+                majority_idx = [i for i, cls in enumerate(train_set[1]) if cls == majority_class]
+                converted_idx = random.sample(majority_idx, n_converted)
+                train_set[1][converted_idx] = minority_class
+
+                sizes_after_conversion = [sum(train_set[1] == c) for c in classes]
+
+                minority_class_after_conversion = classes[np.argmin(sizes_after_conversion)]
+                majority_class_after_conversion = classes[np.argmax(sizes_after_conversion)]
+
+                assert minority_class_after_conversion != majority_class_after_conversion
+                assert minority_class_after_conversion == minority_class
 
             folds.append([train_set, test_set])
 
