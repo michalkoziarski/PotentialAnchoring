@@ -48,8 +48,8 @@ def rbf_score(x, points, gamma, p_norm=2):
     return result
 
 
-def visualize(X, y, appended=None, anchors=None, gamma=None,
-              potential_type='majority', file_name=None, lim=None):
+def visualize(X, y, appended=None, anchors=None, gamma=None, potential_type='majority',
+              minority_class=None, file_name=None, lim=None):
     assert len(np.unique(y)) == 2
     assert X.shape[1] == 2
     assert potential_type in ['majority', 'minority', 'appended']
@@ -59,9 +59,10 @@ def visualize(X, y, appended=None, anchors=None, gamma=None,
 
     plt.style.use('ggplot')
 
-    classes = np.unique(y)
-    sizes = [sum(y == c) for c in classes]
-    minority_class = classes[np.argmin(sizes)]
+    if minority_class is None:
+        classes = np.unique(y)
+        sizes = [sum(y == c) for c in classes]
+        minority_class = classes[np.argmin(sizes)]
 
     minority_points = X[y == minority_class].copy()
     majority_points = X[y != minority_class].copy()
@@ -163,19 +164,20 @@ def prepare_data(dataset_name, n_minority_samples=20, scaler='MinMax'):
     (X_train, y_train), (X_test, y_test) = dataset[0][0], dataset[0][1]
     X, y = np.concatenate([X_train, X_test]), np.concatenate([y_train, y_test])
 
-    minority_class = Counter(y).most_common()[1][0]
-    majority_class = Counter(y).most_common()[0][0]
+    if n_minority_samples is not None:
+        minority_class = Counter(y).most_common()[1][0]
+        majority_class = Counter(y).most_common()[0][0]
 
-    n_minority = Counter(y).most_common()[1][1]
-    n_majority = Counter(y).most_common()[0][1]
+        n_minority = Counter(y).most_common()[1][1]
+        n_majority = Counter(y).most_common()[0][1]
 
-    X, y = RandomUnderSampler(
-        sampling_strategy={
-            minority_class: np.min([n_minority, n_minority_samples]),
-            majority_class: n_majority
-        },
-        random_state=42,
-    ).fit_sample(X, y)
+        X, y = RandomUnderSampler(
+            sampling_strategy={
+                minority_class: np.min([n_minority, n_minority_samples]),
+                majority_class: n_majority
+            },
+            random_state=42,
+        ).fit_sample(X, y)
 
     X = TSNE(n_components=2, random_state=42).fit_transform(X)
 
