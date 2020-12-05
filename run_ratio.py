@@ -14,7 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def evaluate_trial(ratio, fold):
-    RESULTS_PATH = Path(__file__).parents[0] / 'results_preliminary'
+    RESULTS_PATH = Path(__file__).parents[0] / 'results_ratio'
     RANDOM_STATE = 42
 
     for dataset_name in datasets.names():

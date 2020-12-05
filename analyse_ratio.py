@@ -11,7 +11,7 @@ VISUALIZATIONS_PATH = Path(__file__).parent / 'visualizations'
 if __name__ == '__main__':
     VISUALIZATIONS_PATH.mkdir(exist_ok=True, parents=True)
 
-    df = pd.read_csv(f'results/results_preliminary.csv')
+    df = pd.read_csv(f'results/results_ratio.csv')
 
     g = sns.catplot(
         data=df, x='Ratio', y='Score', row='Classifier', col='Metric',
@@ -24,4 +24,4 @@ if __name__ == '__main__':
     for ax in g.axes.flat:
         ax.tick_params(axis='y', labelleft=True)
 
-    plt.savefig(VISUALIZATIONS_PATH / f'preliminary_ratio.pdf', bbox_inches='tight')
+    plt.savefig(VISUALIZATIONS_PATH / f'ratio.pdf', bbox_inches='tight')
