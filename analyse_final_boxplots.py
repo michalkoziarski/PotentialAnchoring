@@ -48,9 +48,9 @@ if __name__ == '__main__':
             g.set(xlabel=None, ylabel=None)
 
             if di is None:
-                file_name = f'boxplot_{classifier}_all.pdf'
+                file_name = f'final_boxplot_{classifier}_all.pdf'
             else:
-                file_name = f'boxplot_{classifier}_{di}.pdf'
+                file_name = f'final_boxplot_{classifier}_{di}.pdf'
 
             plt.savefig(VISUALIZATIONS_PATH / file_name, bbox_inches='tight')
             plt.close()

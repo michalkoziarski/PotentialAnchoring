@@ -110,7 +110,7 @@ def visualize(df):
 
     VISUALIZATIONS_PATH.mkdir(exist_ok=True, parents=True)
 
-    plt.savefig(VISUALIZATIONS_PATH / 'di_impact.pdf', bbox_inches='tight')
+    plt.savefig(VISUALIZATIONS_PATH / 'final_di_impact.pdf', bbox_inches='tight')
     plt.close()
 
 
