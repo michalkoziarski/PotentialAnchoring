@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def distance(x, y, p_norm=1):
+def distance(x, y, p_norm=2):
     return np.sum(np.abs(x - y) ** p_norm) ** (1 / p_norm)
 
 
@@ -38,7 +38,7 @@ def generate_possible_directions(n_dimensions, excluded_direction=None):
 
 
 class RBO:
-    def __init__(self, gamma=0.5, step_size=0.001, n_steps=500, approximate_potential=True,
+    def __init__(self, gamma=0.05, step_size=0.001, n_steps=500, approximate_potential=True,
                  n_nearest_neighbors=25, minority_class=None, n=None, random_state=None):
         self.gamma = gamma
         self.step_size = step_size
