@@ -180,7 +180,7 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.5, lambd=0.01, n_anchors=10, learning_rate=0.001,
+    def __init__(self, gamma=0.5, lambd=0.1, n_anchors=10, learning_rate=0.001,
                  iterations=200, epsilon=1e-4, minority_class=None, n=None, ratio=None,
                  random_state=None, device=torch.device('cpu')):
         super().__init__(
@@ -204,7 +204,7 @@ class PAU(AbstractPA):
 
 
 class PA:
-    def __init__(self, ratio=0.1, gamma=0.5, lambda_pao=0.01, lambda_pau=0.0, n_anchors=10,
+    def __init__(self, ratio=0.1, gamma=0.5, lambda_pao=0.1, lambda_pau=0.0, n_anchors=10,
                  learning_rate=0.001, iterations=200, epsilon=1e-4, minority_class=None,
                  random_state=None, device=torch.device('cpu')):
         assert 0 <= ratio <= 1
