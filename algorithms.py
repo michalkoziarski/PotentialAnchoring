@@ -180,7 +180,7 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.001,
+    def __init__(self, gamma=0.5, lambd=0.01, n_anchors=10, learning_rate=0.001,
                  iterations=200, epsilon=1e-4, minority_class=None, n=None, ratio=None,
                  random_state=None, device=torch.device('cpu')):
         super().__init__(
@@ -204,14 +204,15 @@ class PAU(AbstractPA):
 
 
 class PA:
-    def __init__(self, ratio=0.1, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.001,
-                 iterations=200, epsilon=1e-4, minority_class=None, random_state=None,
-                 device=torch.device('cpu')):
+    def __init__(self, ratio=0.1, gamma=0.5, lambda_pao=0.01, lambda_pau=0.0, n_anchors=10,
+                 learning_rate=0.001, iterations=200, epsilon=1e-4, minority_class=None,
+                 random_state=None, device=torch.device('cpu')):
         assert 0 <= ratio <= 1
 
         self.ratio = ratio
         self.gamma = gamma
-        self.lambd = lambd
+        self.lambda_pao = lambda_pao
+        self.lambda_pau = lambda_pau
         self.n_anchors = n_anchors
         self.learning_rate = learning_rate
         self.iterations = iterations
@@ -221,13 +222,13 @@ class PA:
         self.device = device
 
         self.pao = PAO(
-            gamma=gamma, lambd=lambd, n_anchors=n_anchors, learning_rate=learning_rate,
+            gamma=gamma, lambd=lambda_pao, n_anchors=n_anchors, learning_rate=learning_rate,
             iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
 
         self.pau = PAU(
-            gamma=gamma, lambd=lambd, n_anchors=n_anchors, learning_rate=learning_rate,
+            gamma=gamma, lambd=lambda_pau, n_anchors=n_anchors, learning_rate=learning_rate,
             iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
