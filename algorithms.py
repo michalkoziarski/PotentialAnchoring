@@ -33,18 +33,33 @@ def normalized_potential(anchors, points, gamma):
     return result
 
 
-def loss_function(anchors, prototypes, gamma, reference_potential):
-    return ((reference_potential - normalized_potential(anchors, prototypes, gamma)) ** 2).mean()
+def regularization_term(prototypes, starting_positions, gamma):
+    result = 0.0
+
+    for prototype, starting_position in zip(prototypes, starting_positions):
+        result += rbf(torch.dist(prototype, starting_position), gamma)
+
+    return result
+
+
+def loss_function(anchors, prototypes, starting_positions, reference_potential, gamma, lambd=0.0):
+    loss = ((reference_potential - normalized_potential(anchors, prototypes, gamma)) ** 2).mean()
+
+    if lambd > 0.0:
+        loss += lambd * regularization_term(prototypes, starting_positions, gamma)
+
+    return loss
 
 
 class AbstractPA:
-    def __init__(self, kind, gamma=0.5, n_anchors=10, learning_rate=0.0001,
-                 iterations=200, epsilon=1e-4, minority_class=None, n=None,
-                 ratio=None, random_state=None, device=torch.device('cpu')):
+    def __init__(self, kind, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.0001,
+                 iterations=200, epsilon=1e-4, minority_class=None, n=None, ratio=None,
+                 random_state=None, device=torch.device('cpu')):
         assert kind in ['oversample', 'undersample']
 
         self.kind = kind
         self.gamma = gamma
+        self.lambd = lambd
         self.n_anchors = n_anchors
         self.learning_rate = learning_rate
         self.iterations = iterations
@@ -112,10 +127,15 @@ class AbstractPA:
         else:
             reference_points = majority_points
 
+        indices = np.random.randint(reference_points.shape[0], size=n)
+
         self._prototypes = torch.tensor(
-            reference_points[np.random.randint(reference_points.shape[0], size=n), :] +
-            np.random.normal(scale=self.epsilon, size=(n, reference_points.shape[1])),
+            reference_points[indices, :] + np.random.normal(scale=self.epsilon, size=(n, reference_points.shape[1])),
             device=self.device, requires_grad=True, dtype=torch.float
+        )
+
+        starting_positions = torch.tensor(
+            reference_points[indices, :], device=self.device, requires_grad=False, dtype=torch.float
         )
 
         reference_points = torch.tensor(reference_points, device=self.device, requires_grad=False, dtype=torch.float)
@@ -127,7 +147,10 @@ class AbstractPA:
 
         with tqdm(total=self.iterations) as pbar:
             for i in range(self.iterations):
-                loss = loss_function(self._anchors, self._prototypes, self.gamma, reference_potential)
+                loss = loss_function(
+                    self._anchors, self._prototypes, starting_positions,
+                    reference_potential, self.gamma, self.lambd
+                )
 
                 optimizer.zero_grad()
 
@@ -157,11 +180,11 @@ class AbstractPA:
 
 
 class PAO(AbstractPA):
-    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, iterations=200,
-                 epsilon=1e-4, minority_class=None, n=None, ratio=None,
+    def __init__(self, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.0001,
+                 iterations=200, epsilon=1e-4, minority_class=None, n=None, ratio=None,
                  random_state=None, device=torch.device('cpu')):
         super().__init__(
-            kind='oversample', gamma=gamma, n_anchors=n_anchors,
+            kind='oversample', gamma=gamma, lambd=lambd, n_anchors=n_anchors,
             learning_rate=learning_rate, iterations=iterations,
             epsilon=epsilon, minority_class=minority_class,
             n=n, ratio=ratio, random_state=random_state, device=device
@@ -169,11 +192,11 @@ class PAO(AbstractPA):
 
 
 class PAU(AbstractPA):
-    def __init__(self, gamma=0.5, n_anchors=10, learning_rate=0.0001, iterations=200,
-                 epsilon=1e-4, minority_class=None, n=None, ratio=None,
+    def __init__(self, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.0001,
+                 iterations=200, epsilon=1e-4, minority_class=None, n=None, ratio=None,
                  random_state=None, device=torch.device('cpu')):
         super().__init__(
-            kind='undersample', gamma=gamma, n_anchors=n_anchors,
+            kind='undersample', gamma=gamma, lambd=lambd, n_anchors=n_anchors,
             learning_rate=learning_rate, iterations=iterations,
             epsilon=epsilon, minority_class=minority_class,
             n=n, ratio=ratio, random_state=random_state, device=device
@@ -181,13 +204,14 @@ class PAU(AbstractPA):
 
 
 class PA:
-    def __init__(self, ratio=0.1, gamma=0.5, n_anchors=10, learning_rate=0.0001,
-                 iterations=200, epsilon=1e-4, minority_class=None,
-                 random_state=None, device=torch.device('cpu')):
+    def __init__(self, ratio=0.1, gamma=0.5, lambd=0.0, n_anchors=10, learning_rate=0.0001,
+                 iterations=200, epsilon=1e-4, minority_class=None, random_state=None,
+                 device=torch.device('cpu')):
         assert 0 <= ratio <= 1
 
         self.ratio = ratio
         self.gamma = gamma
+        self.lambd = lambd
         self.n_anchors = n_anchors
         self.learning_rate = learning_rate
         self.iterations = iterations
@@ -197,13 +221,13 @@ class PA:
         self.device = device
 
         self.pao = PAO(
-            gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
+            gamma=gamma, lambd=lambd, n_anchors=n_anchors, learning_rate=learning_rate,
             iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
 
         self.pau = PAU(
-            gamma=gamma, n_anchors=n_anchors, learning_rate=learning_rate,
+            gamma=gamma, lambd=lambd, n_anchors=n_anchors, learning_rate=learning_rate,
             iterations=iterations, epsilon=epsilon, minority_class=minority_class,
             random_state=random_state, device=device
         )
