@@ -40,6 +40,7 @@ if __name__ == '__main__':
         print('& \\multicolumn{3}{l}{' + METRICS[0] + '} & \\multicolumn{3}{l}{' + METRICS[1] + '} \\\\')
         print('\\cmidrule(l){2-4} \\cmidrule(l){5-7}')
         print(f'Clf. & {rb_name} & {pa_name} & $p$-value & {rb_name} & {pa_name} & $p$-value \\\\')
+        print('\\midrule')
 
         for classifier in CLASSIFIERS:
             row = [classifier]
