@@ -30,7 +30,7 @@ if __name__ == '__main__':
         g = sns.boxplot(x='Resampler', y='Score', data=df, palette='muted', order=order)
         g.set(xlabel=None, ylabel=None)
 
-        file_name = f'pa_rb_boxplot_{classifier}.pdf'
+        VISUALIZATIONS_PATH.mkdir(exist_ok=True, parents=True)
 
-        plt.savefig(VISUALIZATIONS_PATH / file_name, bbox_inches='tight')
+        plt.savefig(VISUALIZATIONS_PATH / f'pa_rb_boxplot_{classifier}.pdf', bbox_inches='tight')
         plt.close()

@@ -52,5 +52,7 @@ if __name__ == '__main__':
             else:
                 file_name = f'final_boxplot_{classifier}_{di}.pdf'
 
+            VISUALIZATIONS_PATH.mkdir(exist_ok=True, parents=True)
+
             plt.savefig(VISUALIZATIONS_PATH / file_name, bbox_inches='tight')
             plt.close()
