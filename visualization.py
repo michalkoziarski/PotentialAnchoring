@@ -48,8 +48,8 @@ def rbf_score(x, points, gamma, p_norm=2):
     return result
 
 
-def visualize(X, y, appended=None, anchors=None, gamma=None, potential_type='majority',
-              minority_class=None, file_name=None, lim=None):
+def visualize(X, y, appended=None, replaced=None, anchors=None, gamma=None,
+              potential_type='majority', minority_class=None, file_name=None, lim=None):
     assert len(np.unique(y)) == 2
     assert X.shape[1] == 2
     assert potential_type in ['majority', 'minority', 'appended']
@@ -97,11 +97,18 @@ def visualize(X, y, appended=None, anchors=None, gamma=None, potential_type='maj
         plt.xlim(lim)
         plt.ylim(lim)
 
-    plt.scatter(
-        majority_points[:, 0], majority_points[:, 1],
-        s=MARKER_SIZE, c=COLOR_MAJORITY, linewidths=LINE_WIDTH,
-        alpha=ALPHA, marker=MARKER_SYMBOL, edgecolors=ORIGINAL_EDGE_COLOR
-    )
+    if replaced is None:
+        plt.scatter(
+            majority_points[:, 0], majority_points[:, 1],
+            s=MARKER_SIZE, c=COLOR_MAJORITY, linewidths=LINE_WIDTH,
+            alpha=ALPHA, marker=MARKER_SYMBOL, edgecolors=ORIGINAL_EDGE_COLOR
+        )
+    else:
+        plt.scatter(
+            replaced[:, 0], replaced[:, 1],
+            s=MARKER_SIZE, c=COLOR_MAJORITY, linewidths=LINE_WIDTH,
+            alpha=ALPHA, marker=MARKER_SYMBOL, edgecolors=OVERSAMPLED_EDGE_COLOR
+        )
 
     plt.scatter(
         minority_points[:, 0], minority_points[:, 1],
