@@ -13,7 +13,6 @@ if __name__ == '__main__':
 
     visualize(
         X, y, gamma=gamma,
-        anchors=pao._anchors,
         potential_type='minority',
         file_name=f'example_pao_{dataset_name}_original',
         minority_class=minority_class,
