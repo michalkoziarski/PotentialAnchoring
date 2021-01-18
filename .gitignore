@@ -1,2 +1,2 @@
-data/
-visualizations/
+/data
+/results_*
