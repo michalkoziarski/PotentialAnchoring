@@ -20,7 +20,7 @@ def evaluate_trial(resampler_name, fold, level):
     RANDOM_STATE = 42
 
     resamplers = {
-        'SMOTE': sv.distance_SMOTE(random_state=RANDOM_STATE),
+        'SMOTE': sv.SMOTE(random_state=RANDOM_STATE),
         'polynom-fit-SMOTE': sv.polynom_fit_SMOTE(random_state=RANDOM_STATE),
         'Lee': sv.Lee(random_state=RANDOM_STATE),
         'SMOBD': sv.SMOBD(random_state=RANDOM_STATE),
